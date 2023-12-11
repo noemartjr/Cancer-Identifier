@@ -8,19 +8,44 @@ from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 
 def install_lib(python_lib: str) -> None:
+    """
+        Simple method for installing python library to local venv.
+
+        :param python_lib: (str) python library to install
+        :return: None
+    """
     subprocess.run(['pip', 'install', python_lib])
 
 def retrieve_csv_file(file_path: str):
-    new_file = pd.read_csv(file_path)
-    return new_file
+    """
+        Retrieves the csv file and returns the pandas dataframe
+
+        :param file_path: (str) path to csv file
+        :return: pandas dataframe
+    """
+    return pd.read_csv(file_path)
 
 def remove_features(features) -> dict:
+    """
+        Creates a dictionary of copies of features, each with 0 or 1 features missing
+
+        :param features: (pandas dataframe) features to use
+        :return: (dict) {missing feature: pandas dataframe with feature missing}
+    """
     return_dict = {'': features}
     for missing_feat_ind in features.columns:
         return_dict.update({missing_feat_ind: features.drop(missing_feat_ind, axis=1)})
     return return_dict
 
 def get_folds(x, num_splits: int=5, shuffle: bool=True) -> list:
+    """
+        Returns a list of folds to use.
+
+        :param x: (pandas dataframe) features to be used
+        :param num_splits: (int) number of splits to make
+        :param shuffle: (bool) shuffle the featers
+        :return: (list) list of folds
+    """
     kf = KFold(n_splits=num_splits, shuffle=shuffle)
     return list(kf.split(x))
 
@@ -92,6 +117,12 @@ class predictor_model():
 
 
 def get_data(path: str = 'survey lung cancer.csv'):
+    """
+        Retrieves x and y data from csv file
+
+        :param path: (str) relative path to csv file
+        :return: x features, y labels
+    """
     data = retrieve_csv_file(path)
 
     # print(data)
@@ -107,7 +138,13 @@ def get_data(path: str = 'survey lung cancer.csv'):
 
     return x, y
 
-def count_info(data):
+def count_info(data) -> dict:
+    """
+        Counts the number of people there are in each classification
+
+        :param data: (pandas dataframe) data to process
+        :return: (dict) {feature: list of people in each classification}
+    """
     return_data = {}
 
     for col_name in data.columns:
@@ -119,7 +156,12 @@ def count_info(data):
 
     return return_data
 
-def create_bar_graph(data):
+def create_bar_graph(data: dict) -> None:
+    """
+        Creates a bar graph using the data returned by count_info
+        :param data: (dict) data returned by count_info
+        :return: None
+    """
     plt.figure(figsize=(10, 10))
     for i, data_vals in enumerate(data.values()):
         bottom = 0
